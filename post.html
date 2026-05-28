@@ -51,9 +51,9 @@
         </div>
     </footer>
 
-    <script>
+<script>
         async function loadPost() {
-            // 1. Read the address bar to find the ID (e.g., ?id=65abc...)
+            // 1. Read the address bar to find the ID
             const urlParams = new URLSearchParams(window.location.search);
             const postId = urlParams.get('id');
 
@@ -82,7 +82,7 @@
                 document.getElementById('post-title').textContent = post.title;
                 document.getElementById('post-author').textContent = `By ${post.author}`;
                 
-                // Handle the content (splitting by line breaks to create paragraphs)
+                // Handle the content
                 const bodyContainer = document.getElementById('post-body');
                 const paragraphs = post.content.split('\n');
                 paragraphs.forEach(text => {
@@ -107,6 +107,39 @@
                 document.getElementById('loading').classList.add('hidden');
                 document.getElementById('article-content').classList.remove('hidden');
 
+                // --- MOVED NEW DELETE LOGIC HERE ---
+                // Now it only runs IF the article successfully loaded
+                // and it has access to the postId variable!
+                const deleteBtn = document.getElementById('delete-btn');
+                deleteBtn.classList.remove('hidden'); 
+                
+                deleteBtn.addEventListener('click', async function() {
+                    const isConfirmed = confirm("Are you sure you want to permanently delete this article?");
+                    if (!isConfirmed) return;
+
+                    const secretKey = prompt("Enter Admin Password to delete:");
+                    if (!secretKey) return; 
+
+                    try {
+                        const deleteResponse = await fetch(`/items/${postId}`, {
+                            method: 'DELETE',
+                            headers: {
+                                'X-Admin-Key': secretKey 
+                            }
+                        });
+
+                        if (!deleteResponse.ok) {
+                            throw new Error("Failed to delete. Incorrect password?");
+                        }
+
+                        // Redirect back to home after successful deletion
+                        window.location.href = "/";
+
+                    } catch (error) {
+                        alert(error.message);
+                    }
+                });
+
             } catch (error) {
                 // If the ID is invalid or the database is offline
                 document.getElementById('post-container').innerHTML = `
@@ -118,38 +151,6 @@
                     </div>`;
             }
         }
-        document.getElementById('loading').classList.add('hidden');
-        document.getElementById('article-content').classList.remove('hidden');
-
-        // --- NEW DELETE LOGIC ---
-        const deleteBtn = document.getElementById('delete-btn');
-        deleteBtn.classList.remove('hidden'); // Show the button        
-        deleteBtn.addEventListener('click', async function() {
-            const isConfirmed = confirm("Are you sure you want to permanently delete this article?");
-            if (!isConfirmed) return;
-
-            // Ask for the password via a popup prompt
-            const secretKey = prompt("Enter Admin Password to delete:");
-            if (!secretKey) return; // If they click cancel, stop.
-
-            try {
-                const deleteResponse = await fetch(`/items/${postId}`, {
-                    method: 'DELETE',
-                    headers: {
-                        'X-Admin-Key': secretKey // <--- Attach the password here
-                    }
-                });
-
-                if (!deleteResponse.ok) {
-                    throw new Error("Failed to delete. Incorrect password?");
-                }
-
-                window.location.href = "/";
-
-            } catch (error) {
-                alert(error.message);
-            }
-        });
 
         // Run the function immediately
         loadPost();
