@@ -3,18 +3,33 @@ from typing import Annotated, List, Optional
 
 import motor.motor_asyncio
 from bson import ObjectId
-from fastapi import FastAPI, HTTPException, status
+from fastapi import FastAPI, HTTPException, Depends,status
 from pydantic import BaseModel, ConfigDict, Field
 from pydantic.functional_validators import BeforeValidator
 from fastapi.responses import FileResponse 
 import os
+from fastapi.security import APIKeyHeader
+from dotenv import load_dotenv
 # ==========================================
 # 1. PYDANTIC MAGIC FOR MONGODB
 # ==========================================
 # Represents an ObjectId field in the database.
 # It will be represented as a `str` on the Python model so Pydantic can serialize it to JSON.
 PyObjectId = Annotated[str, BeforeValidator(str)]
+# 1. Look for a live password, or use "mysecret" for local testing
+ADMIN_PASSWORD = os.getenv("ADMIN_PASSWORD", "mysecret")
 
+# 2. Tell FastAPI to look for a header named "X-Admin-Key"
+api_key_header = APIKeyHeader(name="X-Admin-Key")
+
+# 3. Create the bouncer function
+def verify_admin(key: str = Depends(api_key_header)):
+    if key != ADMIN_PASSWORD:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid Admin Password"
+        )
+    return key
 class BlogPostModel(BaseModel):
     id: Optional[PyObjectId] = Field(alias="_id", default=None)
     
@@ -86,7 +101,7 @@ async def serve_create_page():
     return "create.html"
 
 @app.post("/items/", response_model=BlogPostModel, status_code=status.HTTP_201_CREATED)
-async def create_item(item: BlogPostModel):
+async def create_item(item: BlogPostModel,admin: str = Depends(verify_admin)):
     """
     Insert a new item into the database.
     """
@@ -124,3 +139,18 @@ async def get_item(item_id: str):
         raise HTTPException(status_code=404, detail="Item not found")
         
     return item
+
+@app.delete("/items/{item_id}")
+async def delete_item(item_id: str,admin: str = Depends(verify_admin)):
+    """
+    Delete a specific blog post by its database ID.
+    """
+    # 1. Ask MongoDB to delete the document matching this ID
+    result = await db["posts"].delete_one({"_id": ObjectId(item_id)})
+    
+    # 2. Check if it actually found something to delete
+    if result.deleted_count == 0:
+        raise HTTPException(status_code=404, detail="Item not found")
+        
+    # 3. Tell the frontend it worked
+    return {"message": "Article deleted successfully"}
