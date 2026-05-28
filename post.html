@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Blog Post</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
+        body { font-family: 'Inter', sans-serif; background-color: #f9fafb; }
+    </style>
+</head>
+<body class="text-gray-800 antialiased flex flex-col min-h-screen">
+
+    <header class="bg-white shadow-sm sticky top-0 z-50">
+        <div class="max-w-5xl mx-auto px-4 py-4 flex justify-between items-center">
+            <a href="/" class="text-2xl font-bold tracking-tight text-gray-900">Ryan's Blog</a>
+            <a href="/" class="text-blue-600 hover:text-blue-800 font-medium transition">&larr; Back to Home</a>
+        </div>
+    </header>
+
+    <main class="max-w-3xl mx-auto px-4 py-12 flex-grow w-full" id="post-container">
+        <div id="loading" class="text-center text-gray-500 py-20">
+            <p class="text-xl animate-pulse">Loading article...</p>
+        </div>
+
+        <article id="article-content" class="hidden bg-white p-8 md:p-12 rounded-2xl shadow-sm border border-gray-100">
+            <div id="post-tags" class="flex gap-2 mb-4">
+                </div>
+            
+            <h1 id="post-title" class="text-4xl md:text-5xl font-bold text-gray-900 mb-6 leading-tight"></h1>
+            
+            <div class="flex items-center text-gray-500 text-sm mb-10 pb-10 border-b border-gray-100">
+                <span id="post-author" class="font-medium text-gray-900 mr-2"></span>
+                <span>• Read time: 3 min</span>
+            </div>
+
+            <div id="post-body" class="prose max-w-none text-gray-700 leading-loose text-lg">
+                </div>
+        </article>
+    </main>
+
+    <footer class="bg-white border-t border-gray-200 mt-auto">
+        <div class="max-w-5xl mx-auto px-4 py-6 text-center text-gray-500 text-sm">
+            &copy; 2026 Ryan's Blog. All rights reserved.
+        </div>
+    </footer>
+
+    <script>
+        async function loadPost() {
+            // 1. Read the address bar to find the ID (e.g., ?id=65abc...)
+            const urlParams = new URLSearchParams(window.location.search);
+            const postId = urlParams.get('id');
+
+            // If someone visits the page without an ID, show an error
+            if (!postId) {
+                document.getElementById('post-container').innerHTML = `
+                    <div class="text-center py-20">
+                        <h1 class="text-3xl font-bold text-red-600 mb-4">No Article Selected</h1>
+                        <p class="text-gray-600"><a href="/" class="text-blue-600 underline">Go back home</a> to choose an article.</p>
+                    </div>`;
+                return;
+            }
+
+            try {
+                // 2. Ask FastAPI for this specific document
+                const response = await fetch(`/items/${postId}`);
+                
+                if (!response.ok) {
+                    throw new Error("Article not found in database.");
+                }
+
+                // 3. Convert the JSON response into a JavaScript object
+                const post = await response.json();
+
+                // 4. Paint the data onto the screen
+                document.getElementById('post-title').textContent = post.title;
+                document.getElementById('post-author').textContent = `By ${post.author}`;
+                
+                // Handle the content (splitting by line breaks to create paragraphs)
+                const bodyContainer = document.getElementById('post-body');
+                const paragraphs = post.content.split('\n');
+                paragraphs.forEach(text => {
+                    if (text.trim() !== "") {
+                        const p = document.createElement('p');
+                        p.className = "mb-6";
+                        p.textContent = text;
+                        bodyContainer.appendChild(p);
+                    }
+                });
+
+                // Handle the tags
+                const tagsContainer = document.getElementById('post-tags');
+                post.tags.forEach(tag => {
+                    const span = document.createElement('span');
+                    span.className = "bg-blue-100 text-blue-700 px-3 py-1 rounded-full text-xs font-semibold tracking-wide";
+                    span.textContent = tag;
+                    tagsContainer.appendChild(span);
+                });
+
+                // 5. Hide the loading spinner and show the article
+                document.getElementById('loading').classList.add('hidden');
+                document.getElementById('article-content').classList.remove('hidden');
+
+            } catch (error) {
+                // If the ID is invalid or the database is offline
+                document.getElementById('post-container').innerHTML = `
+                    <div class="text-center py-20">
+                        <h1 class="text-3xl font-bold text-red-600 mb-4">Oops!</h1>
+                        <p class="text-gray-600">${error.message}</p>
+                        <br>
+                        <a href="/" class="text-blue-600 font-semibold hover:underline">&larr; Back to Home</a>
+                    </div>`;
+            }
+        }
+
+        // Run the function immediately
+        loadPost();
+    </script>
+</body>
+</html>
