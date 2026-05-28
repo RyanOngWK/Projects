@@ -7,6 +7,7 @@ from fastapi import FastAPI, HTTPException, status
 from pydantic import BaseModel, ConfigDict, Field
 from pydantic.functional_validators import BeforeValidator
 from fastapi.responses import FileResponse 
+import os
 # ==========================================
 # 1. PYDANTIC MAGIC FOR MONGODB
 # ==========================================
@@ -40,7 +41,7 @@ class BlogPostModel(BaseModel):
 # ==========================================
 # 2. DATABASE LIFESPAN MANAGEMENT
 # ==========================================
-MONGO_URL = "mongodb://localhost:27017"
+MONGO_URL = os.getenv("MONGO_URL", "mongodb://localhost:27017")
 client: motor.motor_asyncio.AsyncIOMotorClient = None
 db = None
 
