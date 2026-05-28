@@ -32,7 +32,7 @@
             
             <div class="flex items-center text-gray-500 text-sm mb-10 pb-10 border-b border-gray-100">
                 <span id="post-author" class="font-medium text-gray-900 mr-2"></span>
-                <span>• Read time: 3 min</span>
+                <span>•  time: 3 min</span>
             </div>
 
             <div id="post-body" class="prose max-w-none text-gray-700 leading-loose text-lg">
@@ -113,6 +113,32 @@
                     </div>`;
             }
         }
+        deleteBtn.addEventListener('click', async function() {
+            const isConfirmed = confirm("Are you sure you want to permanently delete this article?");
+            if (!isConfirmed) return;
+
+            // Ask for the password via a popup prompt
+            const secretKey = prompt("Enter Admin Password to delete:");
+            if (!secretKey) return; // If they click cancel, stop.
+
+            try {
+                const deleteResponse = await fetch(`/items/${postId}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'X-Admin-Key': secretKey // <--- Attach the password here
+                    }
+                });
+
+                if (!deleteResponse.ok) {
+                    throw new Error("Failed to delete. Incorrect password?");
+                }
+
+                window.location.href = "/";
+
+            } catch (error) {
+                alert(error.message);
+            }
+        });
 
         // Run the function immediately
         loadPost();
