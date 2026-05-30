@@ -4,9 +4,9 @@ from typing import Annotated, List, Optional
 import motor.motor_asyncio
 from bson import ObjectId
 from fastapi import FastAPI, HTTPException, Depends,status
+from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, ConfigDict, Field
-from pydantic.functional_validators import BeforeValidator
-from fastapi.responses import FileResponse 
+from pydantic.functional_validators import BeforeValidator 
 import os
 from fastapi.security import APIKeyHeader
 from dotenv import load_dotenv
@@ -76,29 +76,22 @@ async def lifespan(app: FastAPI):
 
 app = FastAPI(lifespan=lifespan)
 
+# Define allowed origins (your Vercel domains)
+origins = [
+    "http://localhost:3000",                  # For local development
+    "https://your-frontend-slug.vercel.app", # Your production Vercel URL
+]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],  # Allows GET, POST, DELETE, etc.
+    allow_headers=["*"],  # Allows X-Admin-Key and Content-Type headers
+)
 # ==========================================
 # 3. FASTAPI ENDPOINTS
 # ==========================================
-@app.get("/", response_class=FileResponse)
-async def serve_frontend():
-    """
-    Serve the main HTML UI.
-    """
-    return "index.html"
-
-@app.get("/post.html", response_class=FileResponse)
-async def serve_post_page():
-    """
-    Serve the individual blog post template.
-    """
-    return "post.html"
-
-@app.get("/create.html", response_class=FileResponse)
-async def serve_create_page():
-    """
-    Serve the HTML form for writing new blog posts.
-    """
-    return "create.html"
 
 @app.post("/items/", response_model=BlogPostModel, status_code=status.HTTP_201_CREATED)
 async def create_item(item: BlogPostModel,admin: str = Depends(verify_admin)):
@@ -146,7 +139,7 @@ async def delete_item(item_id: str,admin: str = Depends(verify_admin)):
     Delete a specific blog post by its database ID.
     """
     # 1. Ask MongoDB to delete the document matching this ID
-    result = await db["posts"].delete_one({"_id": ObjectId(item_id)})
+    result = await db["items"].delete_one({"_id": ObjectId(item_id)})
     
     # 2. Check if it actually found something to delete
     if result.deleted_count == 0:
