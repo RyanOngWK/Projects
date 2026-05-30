@@ -150,7 +150,7 @@ export default async function Home() {
   });
 
   return (
-    <main className="min-h-screen bg-neutral-950">
+    <main className="min-h-screen bg-black">
       <FlippingHeader />
       <div className="w-full">
         {posts.length > 0 ? (
