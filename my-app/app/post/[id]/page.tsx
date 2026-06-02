@@ -59,7 +59,7 @@ export default async function BlogPostPage({ params }: { params: Promise<{ id: s
     <main className="min-h-screen bg-neutral-950 text-white p-10 py-20 flex justify-center">
       <article className="max-w-3xl w-full">
         
-        <Link href="/" className="text-neutral-500 hover:text-white mb-10 inline-block transition">
+        <Link href="/timeline" className="text-neutral-500 hover:text-white mb-10 inline-block transition">
           ← Back to Timeline
         </Link>
         

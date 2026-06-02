@@ -6,6 +6,7 @@ import {
   motion,
 } from "motion/react";
 import React, { useEffect, useRef, useState } from "react";
+import Link from "next/link";
 
 interface TimelineEntry {
   title: string;
@@ -38,9 +39,17 @@ export const Timeline = ({ data }: { data: TimelineEntry[] }) => {
       ref={containerRef}
     >
       <div className="max-w-7xl mx-auto py-20 px-4 md:px-8 lg:px-10">
-        <h2 className="text-lg md:text-4xl mb-4 text-white max-w-4xl">
-          Projects Done
-        </h2>
+        <div className="flex items-center justify-between mb-6">
+          <h2 className="text-lg md:text-4xl text-white max-w-4xl">
+            Projects Done
+          </h2>
+          <Link
+            href="/"
+            className="bg-white text-black px-4 py-2 rounded-lg text-sm font-semibold hover:bg-neutral-200 transition"
+          >
+            ←  Back
+          </Link>
+        </div>
         <p className="text-neutral-700 dark:text-neutral-300 text-sm md:text-base max-w-sm">
           I&apos;This serves as a timeline of the articles i wrote related to the projects in Roadmap.sh.
         </p>
