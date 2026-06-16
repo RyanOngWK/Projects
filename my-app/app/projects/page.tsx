@@ -51,7 +51,7 @@ export default function ProjectsPage() {
       <div className="max-w-4xl mx-auto px-6 py-20">
         <h1 className="text-4xl md:text-5xl font-bold mb-4">Projects</h1>
         <p className="text-neutral-400 mb-12 max-w-xl">
-          A collection of projects I&apos;ve worked on. Click through to learn more about each one.
+          A collection of projects I&apos;ve worked on.
         </p>
 
         <div className="grid gap-6">

@@ -55,7 +55,7 @@ export const Timeline = ({ data }: { data: TimelineEntry[] }) => {
           </div>
         </div>
         <p className="text-neutral-700 dark:text-neutral-300 text-sm md:text-base max-w-sm">
-          I&apos;A timeline of articles about projects and learnings from Roadmap.sh.
+          A timeline of articles about projects and learnings from Roadmap.sh.
         </p>
       </div>
 
