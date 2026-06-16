@@ -7,6 +7,7 @@ import {
 } from "motion/react";
 import React, { useEffect, useRef, useState } from "react";
 import Link from "next/link";
+import { UploadBlogButton } from "@/components/UploadBlogButton";
 
 interface TimelineEntry {
   title: string;
@@ -43,12 +44,15 @@ export const Timeline = ({ data }: { data: TimelineEntry[] }) => {
           <h2 className="text-lg md:text-4xl text-white max-w-4xl">
             Blog
           </h2>
-          <Link
-            href="/"
-            className="bg-white text-black px-4 py-2 rounded-lg text-sm font-semibold hover:bg-neutral-200 transition"
-          >
-            ←  Home
-          </Link>
+          <div className="flex items-center gap-2">
+            <UploadBlogButton />
+            <Link
+              href="/"
+              className="bg-white text-black px-4 py-2 rounded-lg text-sm font-semibold hover:bg-neutral-200 transition"
+            >
+              ←  Home
+            </Link>
+          </div>
         </div>
         <p className="text-neutral-700 dark:text-neutral-300 text-sm md:text-base max-w-sm">
           I&apos;A timeline of articles about projects and learnings from Roadmap.sh.
