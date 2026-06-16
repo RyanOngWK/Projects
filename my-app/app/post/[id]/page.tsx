@@ -35,8 +35,8 @@ export default async function BlogPostPage({ params }: { params: Promise<{ id: s
           <p className="mb-2"><strong>Attempted ID:</strong> {postId}</p>
           <p><strong>Error Detail:</strong> {post.detail}</p>
         </div>
-        <Link href="/" className="mt-8 text-neutral-500 hover:text-white transition">
-          ← Back to Timeline
+        <Link href="/blog" className="mt-8 text-neutral-500 hover:text-white transition">
+          ← Back to Blog
         </Link>
       </div>
     );
@@ -47,8 +47,8 @@ export default async function BlogPostPage({ params }: { params: Promise<{ id: s
     return (
       <div className="min-h-screen bg-neutral-950 flex flex-col items-center justify-center text-white">
         <h1 className="text-2xl font-bold mb-4">Post not found</h1>
-        <Link href="/" className="text-neutral-500 hover:text-white transition">
-          ← Back to Timeline
+        <Link href="/blog" className="text-neutral-500 hover:text-white transition">
+          ← Back to Blog
         </Link>
       </div>
     );
@@ -59,8 +59,8 @@ export default async function BlogPostPage({ params }: { params: Promise<{ id: s
     <main className="min-h-screen bg-neutral-950 text-white p-10 py-20 flex justify-center">
       <article className="max-w-3xl w-full">
         
-        <Link href="/timeline" className="text-neutral-500 hover:text-white mb-10 inline-block transition">
-          ← Back to Timeline
+        <Link href="/blog" className="text-neutral-500 hover:text-white mb-10 inline-block transition">
+          ← Back to Blog
         </Link>
         
         <h1 className="text-4xl md:text-6xl font-bold mb-6">{post.title}</h1>

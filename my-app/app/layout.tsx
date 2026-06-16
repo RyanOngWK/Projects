@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono, Inter } from "next/font/google";
 import "./globals.css";
-import NextTopLoader from "nextjs-toploader"; // <-- 1. Import the package
+import NextTopLoader from "nextjs-toploader";
+import { Navbar } from "@/components/Navbar";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -29,7 +30,8 @@ export default function RootLayout({
     <html lang="en">
       {/* 3. Apply the font to the body */}
       <body className={inter.className}>
-        <NextTopLoader /> {/* <-- 2. Place it inside the body, above children */}
+        <NextTopLoader />
+        <Navbar />
         {children}
       </body>
     </html>
